@@ -10,10 +10,12 @@ const AdminDashboard = () => {
     totalUsers: 0,
     totalProfessionals: 0,
     totalFavorites: 0,
-    totalCategories: 0
+    totalCategories: 0,
+    totalMessages: 0
   });
   const [users, setUsers] = useState([]);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'professionals'
+  const [messages, setMessages] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'professionals', 'messages'
 
   useEffect(() => {
     // Check if user is admin
@@ -27,24 +29,34 @@ const AdminDashboard = () => {
     // Load statistics
     loadStatistics();
     loadUsers();
+    loadMessages();
   }, [navigate]);
 
   const loadStatistics = () => {
     const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     const categories = [...new Set(professionals.map(p => p.category))];
+    const allMessages = JSON.parse(localStorage.getItem('messages') || '[]');
 
     setStats({
       totalUsers: allUsers.length,
       totalProfessionals: professionals.length,
       totalFavorites: favorites.length,
-      totalCategories: categories.length
+      totalCategories: categories.length,
+      totalMessages: allMessages.length
     });
   };
 
   const loadUsers = () => {
     const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
     setUsers(allUsers);
+  };
+
+  const loadMessages = () => {
+    const allMessages = JSON.parse(localStorage.getItem('messages') || '[]');
+    // Sort messages by timestamp, newest first
+    const sortedMessages = allMessages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    setMessages(sortedMessages);
   };
 
   const handleLogout = () => {
@@ -58,6 +70,16 @@ const AdminDashboard = () => {
       const updatedUsers = allUsers.filter(u => u.email !== userEmail);
       localStorage.setItem('users', JSON.stringify(updatedUsers));
       loadUsers();
+      loadStatistics();
+    }
+  };
+
+  const handleDeleteMessage = (messageId) => {
+    if (window.confirm('Are you sure you want to delete this message?')) {
+      const allMessages = JSON.parse(localStorage.getItem('messages') || '[]');
+      const updatedMessages = allMessages.filter(m => m.id !== messageId);
+      localStorage.setItem('messages', JSON.stringify(updatedMessages));
+      loadMessages();
       loadStatistics();
     }
   };
@@ -97,6 +119,12 @@ const AdminDashboard = () => {
         >
           Professionals ({stats.totalProfessionals})
         </button>
+        <button 
+          className={activeTab === 'messages' ? 'active' : ''} 
+          onClick={() => setActiveTab('messages')}
+        >
+          Messages ({stats.totalMessages})
+        </button>
       </div>
 
       <div className="admin-content">
@@ -123,6 +151,11 @@ const AdminDashboard = () => {
                 <div className="stat-icon">📁</div>
                 <div className="stat-value">{stats.totalCategories}</div>
                 <div className="stat-label">Categories</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">💬</div>
+                <div className="stat-value">{stats.totalMessages}</div>
+                <div className="stat-label">Total Messages</div>
               </div>
             </div>
 
@@ -203,10 +236,60 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'messages' && (
+          <div className="messages-section">
+            <h2>All Messages</h2>
+            {messages.length > 0 ? (
+              <div className="messages-list">
+                {messages.map(msg => (
+                  <div key={msg.id} className="message-card">
+                    <div className="message-header">
+                      <div className="message-sender-info">
+                        <div className="message-avatar-wrapper">
+                          <img 
+                            src={msg.professionalImage} 
+                            alt={msg.professionalName} 
+                            className="message-professional-avatar" 
+                          />
+                        </div>
+                        <div className="message-details">
+                          <div className="message-title">
+                            <strong>{msg.senderName}</strong> 
+                            <span className="message-arrow">→</span> 
+                            <strong>{msg.professionalName}</strong>
+                          </div>
+                          <div className="message-meta">
+                            <span className="message-email">{msg.senderEmail}</span>
+                            <span className="message-separator">•</span>
+                            <span className="message-date">{msg.date} at {msg.time}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button 
+                        className="delete-btn"
+                        onClick={() => handleDeleteMessage(msg.id)}
+                        title="Delete message"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    <div className="message-content">
+                      <p>{msg.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <p>No messages found.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default AdminDashboard;
-

@@ -13,6 +13,7 @@ import FavoritesPage from './pages/FavoritesPage';
 import SearchPage from './pages/SearchPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminDashboard from './pages/AdminDashboard';
+import CustomerSupportPage from './pages/CustomerSupportPage';
 import './App.css';
 
 // This is the new layout component for your main application.
@@ -55,6 +56,7 @@ function App() {
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/category/:categoryName" element={<ProfessionalsListPage />} />
+        <Route path="/support" element={<CustomerSupportPage />} />
         <Route path="/professional/:id" element={<ProfessionalDetailPage />} />
         <Route path="/contact/:id" element={<ContactPage />} />
       </Route>

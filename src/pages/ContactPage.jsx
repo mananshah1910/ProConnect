@@ -15,6 +15,26 @@ const ContactPage = () => {
       alert('Please provide a more detailed message.');
       return;
     }
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    
+    // Save message to localStorage for admin tracking
+    const newMessage = {
+      id: Date.now(), // Unique ID based on timestamp
+      senderName: currentUser ? currentUser.name : 'Anonymous',
+      senderEmail: currentUser ? currentUser.email : 'anonymous@example.com',
+      professionalId: professional.id,
+      professionalName: professional.name,
+      professionalImage: professional.image,
+      message: message,
+      timestamp: new Date().toISOString(),
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString()
+    };
+    
+    // Get existing messages or initialize empty array
+    const existingMessages = JSON.parse(localStorage.getItem('messages') || '[]');
+    existingMessages.push(newMessage);
+    localStorage.setItem('messages', JSON.stringify(existingMessages));
     // In a real app, this would send the message to a server.
     // For now, we'll simulate it.
     alert(`Message sent to ${professional.name} successfully!\n\nYour message: "${message}"`);

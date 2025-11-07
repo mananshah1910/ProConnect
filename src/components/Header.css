@@ -101,3 +101,28 @@
 .header-link:hover {
   color: #fff;
 }
+.support-icon-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(74, 144, 226, 0.2);
+  color: #4a90e2;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.support-icon-link:hover {
+  background: rgba(74, 144, 226, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+  color: #5ba0f2;
+}
+
+.support-icon-link svg {
+  width: 20px;
+  height: 20px;
+}
